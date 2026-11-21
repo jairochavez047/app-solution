@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Control de mensualidades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f5f3;--surface:#fff;--text:#16211b;--muted:#5d6b63;--line:#dbe3de;--turf:#1f6b3a;--turf-ink:#fff;--late:#b42318;--late-bg:#fde8e6;--soon:#9a5b00;--soon-bg:#fdf1d9;--ok:#1f6b3a;--ok-bg:#e1f2e6;--wa:#1a8f4b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1511;--surface:#16201a;--text:#e7efe9;--muted:#9aaba0;--line:#26352c;--turf:#4cc07a;--turf-ink:#07140c;--late:#ff8f84;--late-bg:#3a1b18;--soon:#f3c46b;--soon-bg:#33270e;--ok:#6fd49a;--ok-bg:#163223;--wa:#38c978;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1511;--surface:#16201a;--text:#e7efe9;--muted:#9aaba0;--line:#26352c;--turf:#4cc07a;--turf-ink:#07140c;--late:#ff8f84;--late-bg:#3a1b18;--soon:#f3c46b;--soon-bg:#33270e;--ok:#6fd49a;--ok-bg:#163223;--wa:#38c978;color-scheme:dark}
+*,*:before,*:after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 Barlow,system-ui,sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h1{font:700 2rem/1 'Barlow Condensed',Barlow,sans-serif;margin:0}
+.sub{color:var(--muted);margin:4px 0 0;font-size:.95rem}
+.btn{font:600 .95rem Barlow,sans-serif;border:1px solid var(--line);background:var(--surface);color:var(--text);padding:9px 14px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--turf)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--turf);outline-offset:2px}
+.btn.pri{background:var(--turf);color:var(--turf-ink);border-color:var(--turf)}
+.btn.sm{padding:6px 10px;font-size:.85rem}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.tab{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:7px 14px;font:600 .9rem Barlow,sans-serif;cursor:pointer}
+.tab b{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;margin-left:4px}
+.tab[aria-pressed=true]{background:var(--turf);border-color:var(--turf);color:var(--turf-ink)}
+input,select,textarea{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%}
+.search{max-width:220px}
+.money{color:var(--muted);font-size:.95rem;margin:0 0 12px}
+.money strong{color:var(--text)}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th{text-align:left;font-weight:600;font-size:.85rem;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line)}
+td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tr.late td:first-child{box-shadow:inset 4px 0 var(--late)}
+tr.soon td:first-child{box-shadow:inset 4px 0 var(--soon)}
+tr.ok td:first-child{box-shadow:inset 4px 0 var(--ok)}
+.nm{font-weight:600}.mt{color:var(--muted);font-size:.85rem}
+.days{font:700 1.9rem/1 'Barlow Condensed',sans-serif;min-width:3.2ch;text-align:center}
+.days small{display:block;font:500 .72rem Barlow,sans-serif;color:var(--muted)}
+.late .days{color:var(--late)}.soon .days{color:var(--soon)}.ok .days{color:var(--ok)}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.8rem;font-weight:600}
+.pill.late{background:var(--late-bg);color:var(--late)}.pill.soon{background:var(--soon-bg);color:var(--soon)}.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.new{background:var(--turf);color:var(--turf-ink);margin-left:6px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+a.wa{background:var(--wa);color:#fff;border-color:var(--wa);text-decoration:none;display:inline-block}
+.sent{color:var(--ok);font-size:.8rem;font-weight:600}
+.empty{padding:36px 16px;text-align:center;color:var(--muted)}
+.empty p{margin:0 0 14px}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text);padding:20px;width:min(520px,94vw)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog h2{font:700 1.5rem 'Barlow Condensed',sans-serif;margin:0 0 12px}
+label{display:block;font-size:.88rem;font-weight:600;margin:10px 0 4px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:.82rem;color:var(--muted);margin:4px 0 0}
+.foot{display:flex;justify-content:space-between;gap:8px;margin-top:16px;flex-wrap:wrap}
+textarea{min-height:90px;resize:vertical}
+@media (max-width:520px){.g2{grid-template-columns:1fr}.search{max-width:none;width:100%}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 id="club">Club</h1>
+      <p class="sub" id="hoy"></p>
+    </div>
+    <div class="tools">
+      <button class="btn" id="bSet">Ajustes</button>
+      <button class="btn" id="bBak">Respaldo</button>
+      <button class="btn pri" id="bAdd">Nuevo estudiante</button>
+    </div>
+  </header>
+
+  <div class="bar">
+    <div class="tabs" id="tabs"></div>
+    <input class="search" id="q" type="search" placeholder="Buscar estudiante" aria-label="Buscar estudiante">
+  </div>
+  <p class="money" id="money"></p>
+  <div class="list" id="list"></div>
+</div>
+
+<dialog id="dStu">
+  <h2 id="dStuT">Nuevo estudiante</h2>
+  <label for="fName">Nombre del estudiante</label><input id="fName">
+  <div class="g2">
+    <div><label for="fPhone">WhatsApp del acudiente</label><input id="fPhone" inputmode="tel" placeholder="3001234567"></div>
+    <div><label for="fCat">Categoría</label><input id="fCat" placeholder="Sub-12"></div>
+  </div>
+  <div class="g2">
+    <div><label for="fFee">Valor mensualidad (COP)</label><input id="fFee" type="number" min="0" step="1000"></div>
+    <div><label for="fJoin">Fecha de ingreso</label><input id="fJoin" type="date"></div>
+  </div>
+  <label for="fPaid">Fecha del último pago</label><input id="fPaid" type="date">
+  <p class="hint">La mensualidad vence un mes después de esta fecha.</p>
+  <div class="foot">
+    <button class="btn" id="fDel" style="display:none">Eliminar</button>
+    <span style="flex:1"></span>
+    <button class="btn" data-close>Cancelar</button>
+    <button class="btn pri" id="fSave">Guardar</button>
+  </div>
+</dialog>
+
+<dialog id="dSet">
+  <h2>Ajustes</h2>
+  <label for="sClub">Nombre del club</label><input id="sClub">
+  <div class="g2">
+    <div><label for="sWarn">Avisar desde (días antes)</label><input id="sWarn" type="number" min="1" max="30"></div>
+    <div><label for="sFee">Mensualidad por defecto</label><input id="sFee" type="number" min="0" step="1000"></div>
+  </div>
+  <label for="sSoon">Mensaje: mensualidad por vencer</label><textarea id="sSoon"></textarea>
+  <label for="sLate">Mensaje: mensualidad vencida</label><textarea id="sLate"></textarea>
+  <p class="hint">Campos disponibles: {nombre} {club} {fecha} {cuando} {valor}</p>
+  <div class="foot"><span style="flex:1"></span><button class="btn" data-close>Cancelar</button><button class="btn pri" id="sSave">Guardar</button></div>
+</dialog>
+
+<dialog id="dBak">
+  <h2>Respaldo de datos</h2>
+  <p class="hint" style="margin-top:0">Los datos se guardan en este navegador. Copia este texto y guárdalo en un lugar seguro. Para restaurar, pégalo aquí y pulsa Restaurar.</p>
+  <textarea id="bTxt" style="min-height:160px;font-size:.8rem"></textarea>
+  <div class="foot"><button class="btn" id="bCopy">Copiar respaldo</button><span style="flex:1"></span><button class="btn" data-close>Cerrar</button><button class="btn pri" id="bRes">Restaurar</button></div>
+  <p class="hint" id="bMsg"></p>
+</dialog>
+
+<script>
+var KEY='club-mensualidades-v1';
+var DEF={club:'Club Deportivo',warn:5,fee:80000,
+tplSoon:'Hola, somos {club} ⚽. Te recordamos que la mensualidad de {nombre} vence el {fecha} ({cuando}). Valor: {valor}. ¡Gracias por acompañarnos!',
+tplLate:'Hola, somos {club}. La mensualidad de {nombre} venció el {fecha} ({cuando}). Valor pendiente: {valor}. Si ya realizaste el pago, ignora este mensaje. ¡Gracias!',
+students:[]};
+var S=load(),filter='hoy',editId=null;
+function load(){try{var r=JSON.parse(localStorage.getItem(KEY));if(r&&typeof r==='object')return Object.assign({},DEF,r)}catch(e){}return JSON.parse(JSON.stringify(DEF))}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+var $=function(i){return document.getElementById(i)};
+var pad=function(n){return String(n).padStart(2,'0')};
+var iso=function(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+var parse=function(s){var p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2])};
+var today=function(){var d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())};
+function addMonth(s){var d=parse(s),r=new Date(d.getFullYear(),d.getMonth()+1,1),last=new Date(r.getFullYear(),r.getMonth()+1,0).getDate();r.setDate(Math.min(d.getDate(),last));return iso(r)}
+var due=function(s){return addMonth(s.paid)};
+var diff=function(s){return Math.round((parse(due(s))-today())/864e5)};
+function stat(s){var d=diff(s);return d<0?'late':d<=S.warn?'soon':'ok'}
+var cop=function(n){return new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(n||0)};
+var fdate=function(s){return parse(s).toLocaleDateString('es-CO',{day:'numeric',month:'long'})};
+var esc=function(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+function cuando(d){return d===0?'vence hoy':d===1?'mañana':d>1?'en '+d+' días':d===-1?'desde ayer':'hace '+(-d)+' días'}
+function msg(s){var d=diff(s),t=d<0?S.tplLate:S.tplSoon;
+ var m={nombre:s.name,club:S.club,fecha:fdate(due(s)),cuando:cuando(d),valor:cop(s.fee)};
+ return t.replace(/\{(\w+)\}/g,function(a,k){return k in m?m[k]:a})}
+function waLink(s){var p=String(s.phone||'').replace(/\D/g,'');if(p.length===10)p='57'+p;return p?'https://wa.me/'+p+'?text='+encodeURIComponent(msg(s)):''}
+var isNew=function(s){return (today()-parse(s.joined))/864e5<=30};
+var sentToday=function(s){return s.reminded===iso(today())};
+
+function counts(){var c={hoy:0,late:0,soon:0,ok:0,all:S.students.length};S.students.forEach(function(s){var st=stat(s);c[st]++;if(st!=='ok'&&!sentToday(s))c.hoy++});return c}
+function render(){
+ $('club').textContent=S.club;
+ $('hoy').textContent=new Date().toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ var c=counts(),T=[['hoy','Avisar hoy'],['late','Vencidos'],['soon','Por vencer'],['ok','Al día'],['all','Todos']];
+ $('tabs').innerHTML=T.map(function(t){return '<button class="tab" data-f="'+t[0]+'" aria-pressed="'+(filter===t[0])+'">'+t[1]+'<b>'+c[t[0]]+'</b></button>'}).join('');
+ var pend=0;S.students.forEach(function(s){if(stat(s)!=='ok')pend+=+s.fee||0});
+ $('money'). innerHTML='Por cobrar (vencidos y por vencer): <strong>'+cop(pend)+'</strong>';
+ var q=$('q').value.trim().toLowerCase();
+ var rows=S.students.filter(function(s){var st=stat(s);
+  if(filter==='hoy'&&(st==='ok'||sentToday(s)))return false;
+  if(['late','soon','ok'].indexOf(filter)>-1&&st!==filter)return false;
+  return !q||(s.name+' '+(s.cat||'')).toLowerCase().indexOf(q)>-1}).sort(function(a,b){return diff(a)-diff(b)});
+ if(!rows.length){
+  $('list').innerHTML='<div class="empty"><p>'+(S.students.length?(filter==='hoy'?'No hay avisos pendientes para hoy.':'No hay estudiantes en esta lista.'):'Aún no hay estudiantes registrados.')+'</p>'+(S.students.length?'':'<button class="btn pri" data-act="add">Agregar el primero</button> <button class="btn" data-act="demo">Cargar ejemplos</button>')+'</div>';return}
+ var lbl={late:'Vencido',soon:'Por vencer',ok:'Al día'};
+ $('list').innerHTML='<table><thead><tr><th>Días</th><th>Estudiante</th><th>Vence</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>'+rows.map(function(s){
+  var st=stat(s),d=diff(s),l=waLink(s);
+  return '<tr class="'+st+'"><td><div class="days">'+Math.abs(d)+'<small>'+(d<0?'de mora':'restantes')+'</small></div></td>'+
+  '<td><div class="nm">'+esc(s.name)+(isNew(s)?'<span class="pill new">Nuevo</span>':'')+'</div><div class="mt">'+esc(s.cat||'Sin categoría')+' · '+cop(s.fee)+'</div></td>'+
+  '<td>'+fdate(due(s))+'</td><td><span class="pill '+st+'">'+lbl[st]+'</span>'+(sentToday(s)?'<div class="sent">✓ Avisado hoy</div>':'')+'</td>'+
+  '<td><div class="acts">'+(l?'<a class="btn sm wa" data-wa="'+s.id+'" href="'+l+'" target="_blank" rel="noopener">Avisar por WhatsApp</a>':'<span class="mt">Sin WhatsApp</span>')+
+  '<button class="btn sm" data-pay="'+s.id+'">Registrar pago</button><button class="btn sm" data-edit="'+s.id+'">Editar</button></div></td></tr>'}).join('')+'</tbody></table>'}
+
+function openStu(id){editId=id;var s=S.students.find(function(x){return x.id===id});
+ $('dStuT').textContent=s?'Editar estudiante':'Nuevo estudiante';
+ $('fName').value=s?s.name:'';$('fPhone').value=s?s.phone:'';$('fCat').value=s?s.cat:'';
+ $('fFee').value=s?s.fee:S.fee;$('fJoin').value=s?s.joined:iso(today());$('fPaid').value=s?s.paid:iso(today());
+ $('fDel').style.display=s?'':'none';$('dStu').showModal()}
+function demo(){var t=today(),f=function(n){var d=new Date(t);d.setDate(d.getDate()+n);return iso(d)};
+ var back=function(n){var d=parse(addMonth(f(n)));var r=new Date(t.getFullYear(),t.getMonth()-1,t.getDate()+n);return iso(r)};
+ [['Santiago Rojas','3001112233','Sub-10',-4],['Valentina Pérez','3104445566','Sub-12',2],['Mateo Gómez','3207778899','Sub-14',15],['Sofía Martínez','3151230987','Sub-10',-12],['Daniel Torres','3012345678','Sub-12',24]].forEach(function(x,i){
+  var d=new Date(t.getFullYear(),t.getMonth(),t.getDate()+x[3]);d.setMonth(d.getMonth()-1);
+  S.students.push({id:'d'+Date.now()+i,name:x[0],phone:x[1],cat:x[2],fee:S.fee,joined:iso(new Date(t.getFullYear(),t.getMonth()-3,10)),paid:iso(d),reminded:''})});
+ save();render()}
+
+document.addEventListener('click',function(e){
+ var t=e.target.closest('button,a');if(!t)return;
+ if(t.dataset.f){filter=t.dataset.f;render()}
+ else if(t.dataset.close!==undefined)t.closest('dialog').close();
+ else if(t.dataset.act==='add')openStu(null);
+ else if(t.dataset.act==='demo')demo();
+ else if(t.dataset.edit)openStu(t.dataset.edit);
+ else if(t.dataset.pay){var s=S.students.find(function(x){return x.id===t.dataset.pay});
+  if(s&&confirm('¿Registrar el pago de '+s.name+' ('+cop(s.fee)+')?')){s.paid=diff(s)>=0?due(s):iso(today());s.reminded='';save();render()}}
+ else if(t.dataset.wa){var s2=S.students.find(function(x){return x.id===t.dataset.wa});if(s2){s2.reminded=iso(today());save();setTimeout(render,400)}}
+});
+$('q').addEventListener('input',render);
+$('bAdd').onclick=function(){openStu(null)};
+$('fSave').onclick=function(){var n=$('fName').value.trim();if(!n){$('fName').focus();return}
+ var o={name:n,phone:$('fPhone').value.trim(),cat:$('fCat').value.trim(),fee:+$('fFee').value||0,joined:$('fJoin').value||iso(today()),paid:$('fPaid').value||iso(today())};
+ var s=S.students.find(function(x){return x.id===editId});
+ if(s)Object.assign(s,o);else S.students.push(Object.assign({id:'s'+Date.now(),reminded:''},o));
+ save();$('dStu').close();render()};
+$('fDel').onclick=function(){var s=S.students.find(function(x){return x.id===editId});
+ if(s&&confirm('¿Eliminar a '+s.name+'?')){S.students=S.students.filter(function(x){return x.id!==editId});save();$('dStu').close();render()}};
+$('bSet').onclick=function(){$('sClub').value=S.club;$('sWarn').value=S.warn;$('sFee').value=S.fee;$('sSoon').value=S.tplSoon;$('sLate').value=S.tplLate;$('dSet').showModal()};
+$('sSave').onclick=function(){S.club=$('sClub').value.trim()||DEF.club;S.warn=Math.max(1,+$('sWarn').value||5);S.fee=+$('sFee').value||0;S.tplSoon=$('sSoon').value||DEF.tplSoon;S.tplLate=$('sLate').value||DEF.tplLate;save();$('dSet').close();render()};
+$('bBak').onclick=function(){$('bTxt').value=JSON.stringify(S);$('bMsg').textContent='';$('dBak').showModal()};
+$('bCopy').onclick=function(){var t=$('bTxt');t.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}
+ $('bMsg').textContent=ok?'Respaldo copiado.':'Selecciona el texto y cópialo manualmente.'};
+$('bRes').onclick=function(){try{var r=JSON.parse($('bTxt').value);if(!r||!Array.isArray(r.students))throw 0;
+ if(!confirm('Se reemplazarán los datos actuales. ¿Continuar?'))return;S=Object.assign({},DEF,r);save();$('dBak').close();render()}catch(e){$('bMsg').textContent='El texto no es un respaldo válido.'}};
+render();
+</script>
+</body>
+</html>
